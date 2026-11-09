@@ -224,7 +224,7 @@ if archivo_subido is not None:
             max_y = max_val * 1.30 if pd.notna(max_val) and max_val > 0 else 10
             
             fig.update_layout(
-                title=dict(text=f"<b>{titulo_grafico}</b>", x=0.5, font=dict(size=24, color="#333333")),
+                title=dict(text=f"<b>{titulo_grafico}</b>", x=0.5, font=dict(size=24, color="black")),
                 barmode='group', bargap=0.3, bargroupgap=0.05, plot_bgcolor='white', height=500,
                 font=dict(size=16, color="black", family="Arial"), 
                 yaxis=dict(showgrid=True, gridcolor='#E5E5E5', range=[0, max_y], tickfont=dict(size=15, color="black")), xaxis=dict(showgrid=False, tickfont=dict(size=16, color="black")),
@@ -234,7 +234,7 @@ if archivo_subido is not None:
 
         def crear_grafico_pareto(df_filtrado, kpi, titulo):
             if df_filtrado.empty:
-                return go.Figure().update_layout(title="No hay datos para esta selección")
+                return go.Figure().update_layout(title=dict(text="No hay datos para esta selección", font=dict(color="black")))
             
             if kpi == "Horas de Parada":
                 df_agrupado = df_filtrado.groupby("Nombre de Equipos")["Horas_Parada"].sum().reset_index()
@@ -250,6 +250,7 @@ if archivo_subido is not None:
             df_agrupado["Acumulado"] = df_agrupado["Porcentaje"].cumsum()
             
             fig = go.Figure()
+            # Restauración de colores originales (#3DA9F2 para barras, #F28735 para líneas) y todo el texto numérico en negro
             fig.add_trace(go.Bar(
                 x=df_agrupado["Nombre de Equipos"], y=df_agrupado["Valor"], name="Métrica",
                 marker_color='#3DA9F2', text=df_agrupado["Valor"].apply(lambda x: f"<b>{x:.1f}{suf}</b>" if kpi == "Horas de Parada" else f"<b>{int(x)}{suf}</b>"),
@@ -259,26 +260,25 @@ if archivo_subido is not None:
                 x=df_agrupado["Nombre de Equipos"], y=df_agrupado["Acumulado"], name="Acumulado %",
                 mode='lines+markers+text', yaxis='y2', line=dict(color='#F28735', width=3),
                 marker=dict(size=8, color='#F28735', symbol='circle'),
-                text=df_agrupado["Acumulado"].apply(lambda x: f"{x:.1f}%"), textposition='top center', textfont=dict(size=15, color="gray")
+                text=df_agrupado["Acumulado"].apply(lambda x: f"{x:.1f}%"), textposition='top center', textfont=dict(size=15, color="black")
             ))
             
             max_y = df_agrupado["Valor"].max() * 1.2 if not df_agrupado.empty else 10
             
-            # --- CORRECCIÓN DE SINTAXIS (title=dict(text=..., font=dict(...))) ---
             fig.update_layout(
-                title=dict(text=f"<b>{titulo}</b>", x=0.5, font=dict(size=24, color="#333333")),
+                title=dict(text=f"<b>{titulo}</b>", x=0.5, font=dict(size=24, color="black")),
                 plot_bgcolor='white', height=500, font=dict(size=16, color="black"),
-                yaxis=dict(title=dict(text=f"<b>{kpi}</b>", font=dict(size=18)), showgrid=True, gridcolor='#E5E5E5', range=[0, max_y], tickfont=dict(size=15)),
-                yaxis2=dict(title=dict(text="<b>% Acumulado</b>", font=dict(size=18)), overlaying='y', side='right', range=[0, 110], showgrid=False, ticksuffix="%", tickfont=dict(size=15)),
-                xaxis=dict(tickangle=-45, showgrid=False, tickfont=dict(size=15)),
+                yaxis=dict(title=dict(text=f"<b>{kpi}</b>", font=dict(size=18, color="black")), showgrid=True, gridcolor='#E5E5E5', range=[0, max_y], tickfont=dict(size=15, color="black")),
+                yaxis2=dict(title=dict(text="<b>% Acumulado</b>", font=dict(size=18, color="black")), overlaying='y', side='right', range=[0, 110], showgrid=False, ticksuffix="%", tickfont=dict(size=15, color="black")),
+                xaxis=dict(tickangle=-45, showgrid=False, tickfont=dict(size=15, color="black")),
                 margin=dict(t=60, b=120, l=10, r=10),
-                legend=dict(orientation="h", yanchor="top", y=-0.25, xanchor="center", x=0.5, font=dict(size=16))
+                legend=dict(orientation="h", yanchor="top", y=-0.25, xanchor="center", x=0.5, font=dict(size=16, color="black"))
             )
             return fig
 
         def crear_grafico_pie(df_filtrado):
             if df_filtrado.empty:
-                return go.Figure().update_layout(title="No hay datos para esta selección")
+                return go.Figure().update_layout(title=dict(text="No hay datos para esta selección", font=dict(color="black")))
             
             df_agrupado = df_filtrado.groupby("Criticidad").size().reset_index(name="Cantidad")
             fig = go.Figure(data=[go.Pie(
@@ -286,14 +286,14 @@ if archivo_subido is not None:
                 values=df_agrupado["Cantidad"],
                 hole=0.4,
                 textinfo='label+percent+value',
-                textfont=dict(size=18, color="white"),
+                textfont=dict(size=18, color="black"),
                 marker=dict(colors=['#E74C3C', '#F28735', '#F1C40F', '#539A37', '#9B59B6']) 
             )])
             
             fig.update_layout(
-                title=dict(text="<b>Fallas por Nivel de Criticidad</b>", x=0.5, font=dict(size=26, color="#333333")),
+                title=dict(text="<b>Fallas por Nivel de Criticidad</b>", x=0.5, font=dict(size=26, color="black")),
                 height=650, margin=dict(t=80, b=40, l=10, r=10),
-                legend=dict(orientation="h", yanchor="top", y=-0.1, xanchor="center", x=0.5, font=dict(size=18))
+                legend=dict(orientation="h", yanchor="top", y=-0.1, xanchor="center", x=0.5, font=dict(size=18, color="black"))
             )
             return fig
 
@@ -413,8 +413,34 @@ if archivo_subido is not None:
 
         with tab4:
             st.markdown("### ⏱️ Historial de Tiempos Filtrados")
-            columnas_historial = [col for col in ["Fecha", "MAQUINA", "Nombre de Equipos", "Tipo", "Horas_Parada", "Criticidad", "Descripcion"] if col in df_mantenimiento.columns]
-            st.dataframe(df_mantenimiento[columnas_historial], use_container_width=True)
+            
+            # --- PANEL DE 5 FILTROS PARA EL HISTORIAL ---
+            col_h1, col_h2, col_h3, col_h4, col_h5 = st.columns(5)
+            with col_h1: hist_mes = st.selectbox("Mes:", ["Todos"] + meses_presentes, key="hist_mes")
+            with col_h2: hist_maq = st.selectbox("Máquina:", ["Todas"] + list(mapa_maquinas.keys()), key="hist_maq")
+            
+            opciones_equipos_hist = ["Todos"] + sorted(list(df_mantenimiento["Nombre de Equipos"].dropna().astype(str).unique()))
+            with col_h3: hist_eq = st.selectbox("Sub-Equipo:", opciones_equipos_hist, key="hist_eq")
+            with col_h4: hist_tip = st.selectbox("Tipo:", ["Total (M+E)", "Mecánico (M)", "Eléctrico (E)"], key="hist_tip")
+            
+            opciones_crit_hist = ["Todas"] + sorted(list(df_mantenimiento["Criticidad"].astype(str).unique()))
+            with col_h5: hist_crit = st.selectbox("Criticidad:", opciones_crit_hist, key="hist_crit")
+            
+            # Aplicación secuencial de los filtros
+            df_historial = df_mantenimiento.copy()
+            if hist_mes != "Todos": df_historial = df_historial[df_historial["Mes_Texto"] == hist_mes]
+            if hist_maq != "Todas": df_historial = df_historial[df_historial["MAQUINA"] == hist_maq]
+            if hist_eq != "Todos": df_historial = df_historial[df_historial["Nombre de Equipos"] == hist_eq]
+            if hist_tip == "Mecánico (M)": df_historial = df_historial[df_historial["Tipo"] == "M"]
+            elif hist_tip == "Eléctrico (E)": df_historial = df_historial[df_historial["Tipo"] == "E"]
+            if hist_crit != "Todas": df_historial = df_historial[df_historial["Criticidad"].astype(str) == hist_crit]
+            
+            # Se ha añadido "Mes_Texto" (Mes) a la visualización de la tabla
+            columnas_historial = [col for col in ["Fecha", "Mes_Texto", "MAQUINA", "Nombre de Equipos", "Tipo", "Horas_Parada", "Criticidad", "Descripcion"] if col in df_mantenimiento.columns]
+            
+            # Renombramos "Mes_Texto" a "Mes" únicamente para la vista en pantalla de la tabla
+            df_mostrar = df_historial[columnas_historial].rename(columns={"Mes_Texto": "Mes"})
+            st.dataframe(df_mostrar, use_container_width=True)
 
         # ==========================================
         # BOTÓN DE DESCARGA EN LA BARRA LATERAL
