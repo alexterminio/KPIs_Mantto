@@ -1,0 +1,4 @@
+Ini, TOML
+[server]
+enableCORS = false
+enableXsrfProtection = false
